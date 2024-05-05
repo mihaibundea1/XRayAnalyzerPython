@@ -43,14 +43,14 @@ class MainWindow(QMainWindow):
         self.image_view.setMinimumWidth(1000)
         self.main_layout.addWidget(self.image_view)
 
-        self.fig = Figure(figsize=(3, 3), facecolor=(30/255, 30/255, 30/255))
+        self.fig = Figure(figsize=(1, 2), facecolor=(30/255, 30/255, 30/255))
         self.canvas = FigureCanvas(self.fig)
-        self.canvas.setMaximumSize(350,350)
+        self.canvas.setMaximumSize(500,350)
         self.leftVerticalLayout.addWidget(self.canvas)
 
         # Create a QListWidget for the photo details
         self.photo_details_listbox = QListWidget()
-        self.photo_details_listbox.setMaximumWidth(350)
+        self.photo_details_listbox.setMaximumWidth(700)
 
         self.leftVerticalLayout.addWidget(self.photo_details_listbox)
 
@@ -88,9 +88,35 @@ class MainWindow(QMainWindow):
         # self.container = QWidget()
         # self.setCentralWidget(self.container)
 
-    def photoClicked(self, pos):
-        if self.viewer.dragMode()  == QtWidgets.QGraphicsView.NoDrag:
-            self.editPixInfo.setText('%d, %d' % (pos.x(), pos.y()))
+    def create_bar_graph(self, data):
+        # Clear the current axes, necessary if you want to update the graph
+        self.fig.clear()
+
+        # Create an axes instance in your figure
+        ax = self.fig.add_subplot(111, facecolor='none')
+
+        # Create a horizontal bar graph with your data
+        bars = ax.barh(range(len(data)), data, color='orange')
+
+        # Set the limits of y-axis
+        ax.set_xlim([0, 1])
+
+        # Set the color of the labels and ticks to white for visibility on dark background
+        ax.tick_params(colors='white')
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
+
+        # Label the bars
+        labels = ['NORMAL', 'PNEUMONIA']
+        ax.set_yticks(range(len(data)))
+        ax.set_yticklabels(labels)
+
+        # Add value labels to each bar
+        for bar, value in zip(bars, data):
+            ax.text(value, bar.get_y(), ' {:.2f}'.format(value), va='center', color='white')
+
+        self.canvas.draw()
+
 
     def create_menu(self):
         # Create a QMenuBar
@@ -130,39 +156,17 @@ class MainWindow(QMainWindow):
         selected_file = self.file_listbox.currentItem().text()
         file_path = os.path.join(self.folder_path, selected_file)
         self.display_image(file_path)
+        self.call_classify_image(file_path)
 
     def display_image(self, file_path):
         pixmap = QPixmap(file_path)
-
         self.image_view._photo.setPixmap(pixmap)
-
         self.image_view.fitInView()
 
-    def update_graph(self, file_path):
-        # Clear previous plot
-        print("Aici")
-        classification_result = callable.classify_image(file_path)
-        print("2")
-        self.ax.clear()
-
-        # Extract values from the classification result tuple
-        print("3")
-        value1, value2 = classification_result
-
-        print("4")
-        # Create a list of probabilities and class labels
-        probabilities = [value1, value2]
-        print("5")
-        class_labels = ["NORMAL", "PNEUMONIA"]
-
-        print("6")
-        # Visualize predictions using provided function
-        fig = callable.visualize_predictions(file_path, probabilities, class_labels)
-        # Update the FigureCanvas
-        print("7")
-        self.graph_canvas.draw()
-
-
+    def call_classify_image(self, file_path):
+        var = callable.classify_image(file_path)
+        print(var)
+        self.create_bar_graph(var)
 
 if __name__ == "__main__":
     app = QApplication([])
