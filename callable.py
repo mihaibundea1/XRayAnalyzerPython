@@ -67,7 +67,6 @@ def calculate_accuracy(output_vector, true_label):
 def preprocess_image(image_path, transform):
     print(image_path)
     image = Image.open(image_path).convert("RGB")
-    print("4")
     return image, transform(image).unsqueeze(0)
 
 
@@ -111,17 +110,10 @@ def visualize_predictions(original_image, probabilities, class_names):
 
 
 def classify_image(image_path):
-    print(image_path)
     model = XRayClassifier(num_classes=2)
-    print("1")
     model.load_state_dict(torch.load("D:/XRay/chest_x_ray_resnet18_best_version.pth", map_location=device))
-    print("2")
-
     original_image, image_tensor = preprocess_image(image_path, transform)
-    print("3")
-
     probabilities = predict(model, image_tensor, device)
-    print("4")
 
     return probabilities
 

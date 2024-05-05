@@ -25,18 +25,23 @@ class GraphicsView(QGraphicsView):
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(30, 30, 30)))
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
+        # to make the background black
+        # self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(30, 30, 30)))
 
     def hasPhoto(self):
         return not self._empty
 
+
+    # trebuie gasita  o alta metoda pentru ca functia asta nu e nicioadata apelata pentru a face 'resize'
     def fitInView(self, scale=True):
         rect = QtCore.QRectF(self._photo.pixmap().rect())
         if not rect.isNull():
             self.setSceneRect(rect)
             if self.hasPhoto():
                 unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
+                print(unity.width())
+                print(unity.height())
                 self.scale(1 / unity.width(), 1 / unity.height())
                 viewrect = self.viewport().rect()
                 scenerect = self.transform().mapRect(rect)

@@ -22,18 +22,17 @@ class MainWindow(QMainWindow):
 
         self.create_menu()
 
-        self.folder_path = "D:/XRay/Images/chest_xray/test/NORMAL"
+        self.folder_path = None
 
         self.main_layout = QHBoxLayout()
         self.layout = QVBoxLayout()
         self.leftVerticalLayout = QVBoxLayout()
 
-        self.path_label = QLabel("Current Path: ")
+        self.path_label = QLabel()
         self.layout.addWidget(self.path_label)
 
         self.file_listbox = QListWidget()
         self.file_listbox.itemClicked.connect(self.load_selected_image)
-        # self.file_listbox.setStyleSheet("background-color: black; color: white;")
         self.file_listbox.setMaximumWidth(250)
         self.layout.addWidget(self.file_listbox)
 
@@ -43,14 +42,16 @@ class MainWindow(QMainWindow):
         self.image_view.setMinimumWidth(1000)
         self.main_layout.addWidget(self.image_view)
 
-        self.fig = Figure(figsize=(1, 2), facecolor=(30/255, 30/255, 30/255))
+        self.fig = Figure(figsize=(6, 3), facecolor="none")
         self.canvas = FigureCanvas(self.fig)
-        self.canvas.setMaximumSize(500,350)
+        self.canvas.setMaximumSize(400,400)
+        # Create an axes instance in your figure
+
         self.leftVerticalLayout.addWidget(self.canvas)
 
         # Create a QListWidget for the photo details
         self.photo_details_listbox = QListWidget()
-        self.photo_details_listbox.setMaximumWidth(700)
+        self.photo_details_listbox.setMaximumWidth(400)
 
         self.leftVerticalLayout.addWidget(self.photo_details_listbox)
 
@@ -60,51 +61,30 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget()
         self.central_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.central_widget)
-        self.setStyleSheet("background-color: rgb(30, 30, 30); color: white;")
-
-        # Set the layout for the main window
-        # central_widget = QWidget()
-        # central_widget.setLayout(self.main_layout)
-        # self.setCentralWidget(central_widget)
-
-
-        # # Create a QLabel to display the image
-        # self.image_label = QLabel()
-        # self.main_layout.addWidget(self.image_label)
-
-        # # Create a QPushButton to load files
-        # self.load_files_button = QPushButton("Load Files")
-        # self.load_files_button.clicked.connect(self.load_files)
-        # self.layout.addWidget(self.load_files_button)
-
-        # # Create a new matplotlib figure and draw a graph
-        # self.fig, self.ax = plt.subplots(figsize=(14, 7))
-
-        # # Create a new FigureCanvas and embed the matplotlib figure into it
-        # self.graph_canvas = FigureCanvas(self.fig)
-        # self.layout.addWidget(self.graph_canvas)
-
-        # # Set the layout on the application's window
-        # self.container = QWidget()
-        # self.setCentralWidget(self.container)
+        # self.setStyleSheet("background-color: rgb(30, 30, 30); color: white;")
 
     def create_bar_graph(self, data):
         # Clear the current axes, necessary if you want to update the graph
         self.fig.clear()
 
-        # Create an axes instance in your figure
         ax = self.fig.add_subplot(111, facecolor='none')
+        self.fig.subplots_adjust(0.25)
 
         # Create a horizontal bar graph with your data
         bars = ax.barh(range(len(data)), data, color='orange')
 
         # Set the limits of y-axis
         ax.set_xlim([0, 1])
+        ax.set_ylim([-0.5, len(data)-0.5])  # Adjust the limits of y-axis
 
         # Set the color of the labels and ticks to white for visibility on dark background
         ax.tick_params(colors='white')
         ax.xaxis.label.set_color('white')
         ax.yaxis.label.set_color('white')
+
+        ax.tick_params(colors='black')
+        ax.xaxis.label.set_color('black')
+        ax.yaxis.label.set_color('black')
 
         # Label the bars
         labels = ['NORMAL', 'PNEUMONIA']
@@ -116,7 +96,6 @@ class MainWindow(QMainWindow):
             ax.text(value, bar.get_y(), ' {:.2f}'.format(value), va='center', color='white')
 
         self.canvas.draw()
-
 
     def create_menu(self):
         # Create a QMenuBar
@@ -146,7 +125,7 @@ class MainWindow(QMainWindow):
 
     def load_files(self):
         self.folder_path = QFileDialog.getExistingDirectory(self, "Select Directory")
-        self.path_label.setText(f"Current Path: {self.folder_path}")
+        self.path_label.setText(f"{self.folder_path}")
         if self.folder_path:
             self.file_listbox.clear()
             for file_name in os.listdir(self.folder_path):
