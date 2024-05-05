@@ -1,0 +1,7 @@
+{
+    "files": [
+        "GraphicsView.py",
+        "callable.py",
+        "widget.py"
+    ]
+}
