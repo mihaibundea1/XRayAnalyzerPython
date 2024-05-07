@@ -2,6 +2,7 @@
     "files": [
         "GraphicsView.py",
         "callable.py",
+        "images.qrc",
         "widget.py"
     ]
 }
