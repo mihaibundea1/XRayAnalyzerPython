@@ -64,7 +64,8 @@ class MainWindow(QMainWindow):
 
         self.buttonMove = QPushButton()
         self.buttonMove.setIcon(QIcon(":/moveIcon.png"))  # replace with your image path
-        self.buttonMove.setIconSize(QSize(32, 32))  # set the icon size to 32x32 pixels
+        self.buttonMove.setIconSize(QSize(24, 24))  # set the icon size to 32x32 pixels
+        self.buttonMove.setCheckable(True)
 
         # Set the QPushButton size to 32x32 pixels
         self.buttonMove.setFixedSize(QSize(32, 32))

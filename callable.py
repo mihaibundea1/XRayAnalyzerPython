@@ -109,9 +109,10 @@ def visualize_predictions(original_image, probabilities, class_names):
     return fig
 
 
+model = XRayClassifier(num_classes=2)
+model.load_state_dict(torch.load("D:/XRay/chest_x_ray_resnet18_best_version.pth", map_location=device))
+
 def classify_image(image_path):
-    model = XRayClassifier(num_classes=2)
-    model.load_state_dict(torch.load("D:/XRay/chest_x_ray_resnet18_best_version.pth", map_location=device))
     original_image, image_tensor = preprocess_image(image_path, transform)
     probabilities = predict(model, image_tensor, device)
 
