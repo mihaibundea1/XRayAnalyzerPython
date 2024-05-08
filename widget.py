@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QListWidget,
 from PyQt5.QtGui import QImage, QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QLabel, QListWidget, QGraphicsScene, QWidget
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QLabel, QListWidget, QGraphicsScene, QWidget, QLineEdit
 from GraphicsView import GraphicsView
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
@@ -22,6 +22,102 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import utils
 
+import numpy as np
+from sklearn.metrics import confusion_matrix
+from matplotlib.colors import LinearSegmentedColormap
+
+class NewWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Confusion Matrix")
+        self.setStyleSheet("background-color: rgb(30, 30, 30); color: white;")
+        self.showMaximized()
+
+        self.horizontalLayout = QHBoxLayout()
+        self.verticalLayout = QVBoxLayout()
+
+        self.label = QLabel('File path for dataset: ')
+        self.label.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
+        self.text_edit= QLineEdit()
+        self.text_edit.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
+        self.text_edit.setPlaceholderText("Enter text here...")
+        self.button = QPushButton('Generate')
+        self.button.clicked.connect(self.button_clicked)
+        self.button.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
+        self.horizontalLayout.addWidget(self.label)
+        self.horizontalLayout.addWidget(self.text_edit)
+        self.horizontalLayout.addWidget(self.button)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.canvas = FigureCanvas(Figure(facecolor='black'))
+        self.canvas.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.verticalLayout.addWidget(self.canvas)
+
+        central_widget = QWidget()
+        central_widget.setLayout(self.verticalLayout)
+        self.setCentralWidget(central_widget)
+
+    def button_clicked(self):
+        text = self.text_edit.text()
+        if os.path.exists(text):
+            print("Button clicked!")
+            self.update_confusion_plot(text)
+
+    def update_confusion_plot(self, text):
+        try:
+            # Clear the existing plot
+            self.canvas.figure.clear()
+
+            # Generate the confusion matrix array
+            true_labels, predicted_labels = callable.return_conf_matrix_data(text)
+
+            # Check the type and shape of the confusion matrix array
+            conf_matrix = confusion_matrix(true_labels, predicted_labels)
+
+            # Define custom colormap with darker shades of blue
+            colors = [(0.1, 0.2, 0.4), (0.2, 0.4, 0.6), (0.3, 0.5, 0.7), (0.4, 0.6, 0.8), (0.5, 0.7, 0.9)]
+            cmap = LinearSegmentedColormap.from_list("Custom", colors)
+
+            # Create an axes instance in your figure
+            ax = self.canvas.figure.add_subplot(111, facecolor=(30/255, 30/255, 30/255))
+
+            # Plot confusion matrix with custom colormap
+            im = ax.imshow(conf_matrix, interpolation='nearest', cmap=cmap)
+
+            # Add labels to the plot with white text
+            classes = [0, 1]  # Assuming you have class 0 and class 1
+            num_classes = len(classes)
+            for i in range(num_classes):
+                for j in range(num_classes):
+                    ax.text(j, i, format(conf_matrix[i, j], 'd'), ha="center", va="center", color="white")
+
+            # Customize ticks and labels
+            ax.set_xticks(np.arange(num_classes))
+            ax.set_yticks(np.arange(num_classes))
+            ax.set_xticklabels(classes)
+            ax.set_yticklabels(classes)
+            ax.set_xlabel('Predicted label', color="white")
+            ax.set_ylabel('True label', color="white")
+            ax.xaxis.label.set_color('white')
+            ax.yaxis.label.set_color('white')
+
+            # Add a colorbar
+            cbar = ax.figure.colorbar(im, ax=ax)
+            cbar.ax.yaxis.set_tick_params(color='white')
+            plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')  # Set colorbar ticks to white
+
+            # Set transparency for the colorbar
+            cbar.set_alpha(0)
+
+            self.canvas.draw()
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+
+
+
+
 class Property:
     def __init__(self, name):
         self.name = name
@@ -33,7 +129,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.setWindowTitle("Image Viewer and Graphic Generator")
+        self.setWindowTitle("XRayAnalyzer")
         self.setGeometry(0, 0, 1920, 1080)
         self.showMaximized()
         self.create_menu()
@@ -217,7 +313,7 @@ class MainWindow(QMainWindow):
 
         # Create a QAction
         openAction = QAction("Open", self)
-        saveAction = QAction("Save", self)
+        saveAction = QAction("Confusion Matrix", self)
 
         # Add QAction to QMenu
         fileMenu.addAction(openAction)
@@ -232,8 +328,8 @@ class MainWindow(QMainWindow):
 
     def save_file(self):
         # Implement your function to save a
-        callable.confusion_matrixDraw('C:/Users/PC241/Downloads/chest_xray/test')
-        pass
+        self.new_window = NewWindow()
+        self.new_window.show()
 
     def load_files(self):
         self.folder_path = QFileDialog.getExistingDirectory(self, "Select Directory")
@@ -268,7 +364,6 @@ class MainWindow(QMainWindow):
 
     def call_classify_image(self, file_path):
         var = callable.classify_image(file_path)
-        print(var)
         self.create_bar_graph(var)
         for i in range(self.photo_details_listbox.count()):
             item = self.photo_details_listbox.item(i)

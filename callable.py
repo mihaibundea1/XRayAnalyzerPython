@@ -29,7 +29,7 @@ transform = transforms.Compose([
 class XRayClassifier(nn.Module):
     def __init__(self, num_classes=2):
         super(XRayClassifier, self).__init__()
-        self.base_model = models.resnet18(pretrained=True)
+        self.base_model = models.resnet18(weights=models.resnet.ResNet18_Weights.DEFAULT)
         # Where we define all the parts of the model
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
@@ -70,7 +70,6 @@ def calculate_accuracy(output_vector, true_label):
 
 # Load and preprocess the image
 def preprocess_image(image_path, transform):
-    print(image_path)
     image = Image.open(image_path).convert("RGB")
     return image, transform(image).unsqueeze(0)
 
@@ -115,7 +114,7 @@ def visualize_predictions(original_image, probabilities, class_names):
 
 
 model = XRayClassifier(num_classes=2)
-model.load_state_dict(torch.load("C:/Users/PC241/Documents/XRayAnalyzerPython/chest_x_ray_resnet18_best_version.pth", map_location=device))
+model.load_state_dict(torch.load("D:/XRay/chest_x_ray_resnet18_best_version.pth", map_location=device))
 
 def classify_image(image_path):
     original_image, image_tensor = preprocess_image(image_path, transform)
@@ -174,7 +173,7 @@ def confusion_matrixDraw(test_dir):
     cmap = LinearSegmentedColormap.from_list("Custom", colors)
 
     # Create a figure with a black background
-    fig, ax = plt.subplots(facecolor='none')
+    fig, ax = plt.subplots(facecolor=(30/255, 30/255, 30/255))
 
     # Plot confusion matrix with custom colormap
     im = ax.imshow(conf_matrix, interpolation='nearest', cmap=cmap)
@@ -205,6 +204,27 @@ def confusion_matrixDraw(test_dir):
     # Set transparency for the colorbar
     cbar.set_alpha(0)
 
-    plt.show()
+    fig.draw()
 
+def return_conf_matrix_data(test_dir):
+    print(test_dir)
+    test_data = XRayDataset(test_dir, transform=transform)
+    print(test_data)
+    test_dl = DataLoader(test_data, batch_size=32, num_workers=2, pin_memory=True)
+    print(test_dl)
+    model.eval()
+    # Lists to store true labels and predicted labels
+    true_labels = []
+    predicted_labels = []
+    for inputs, labels in test_dl:
+        # Move inputs to the same device as the model
+        inputs = inputs.to(device)
+
+        # Forward pass to get predictions
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+
+        true_labels.extend(labels.cpu().numpy())
+        predicted_labels.extend(predicted.cpu().numpy())
+    return true_labels, predicted_labels
 
