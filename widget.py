@@ -231,7 +231,8 @@ class MainWindow(QMainWindow):
         saveAction.triggered.connect(self.save_file)
 
     def save_file(self):
-        # Implement your function to save a file
+        # Implement your function to save a
+        callable.confusion_matrixDraw('C:/Users/PC241/Downloads/chest_xray/test')
         pass
 
     def load_files(self):

@@ -12,8 +12,13 @@ import matplotlib.pyplot as plt
 stats = ((0.5832, 0.5832, 0.5832), (0.1413, 0.1413, 0.1413))
 # Mean:  tensor([0.5832, 0.5832, 0.5832])
 # Std:  tensor([0.1413, 0.1413, 0.1413])
+
+def convert_to_rgb(image):
+    return image.convert("RGB")
+
 transform = transforms.Compose([
-    transforms.Lambda(lambda x: x.convert("RGB")),
+#    transforms.Lambda(lambda x: x.convert("RGB")),
+    convert_to_rgb,
     transforms.Resize(256),
     transforms.CenterCrop(224),
     transforms.ToTensor(),
@@ -110,11 +115,96 @@ def visualize_predictions(original_image, probabilities, class_names):
 
 
 model = XRayClassifier(num_classes=2)
-model.load_state_dict(torch.load("D:/XRay/chest_x_ray_resnet18_best_version.pth", map_location=device))
+model.load_state_dict(torch.load("C:/Users/PC241/Documents/XRayAnalyzerPython/chest_x_ray_resnet18_best_version.pth", map_location=device))
 
 def classify_image(image_path):
     original_image, image_tensor = preprocess_image(image_path, transform)
     probabilities = predict(model, image_tensor, device)
 
     return probabilities
+
+from torchvision.datasets import ImageFolder
+from torch.utils.data import Dataset
+
+class XRayDataset(Dataset):
+    def __init__(self, data_dir, transform=None):
+        self.data = ImageFolder(data_dir, transform=transform)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+
+    @property
+    def classes(self):
+        return self.data.classes
+
+
+from torch.utils.data import Dataset, random_split, DataLoader
+from sklearn.metrics import confusion_matrix
+from matplotlib.colors import LinearSegmentedColormap
+
+def confusion_matrixDraw(test_dir):
+    print(test_dir)
+    test_data = XRayDataset(test_dir, transform=transform)
+    print(test_data)
+    test_dl = DataLoader(test_data, batch_size=32, num_workers=2, pin_memory=True)
+    print(test_dl)
+    model.eval()
+    # Lists to store true labels and predicted labels
+    true_labels = []
+    predicted_labels = []
+    for inputs, labels in test_dl:
+        # Move inputs to the same device as the model
+        inputs = inputs.to(device)
+
+        # Forward pass to get predictions
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+
+        true_labels.extend(labels.cpu().numpy())
+        predicted_labels.extend(predicted.cpu().numpy())
+
+    # Calculate confusion matrix
+    conf_matrix = confusion_matrix(true_labels, predicted_labels)
+
+    # Define custom colormap with darker shades of blue
+    colors = [(0.1, 0.2, 0.4), (0.2, 0.4, 0.6), (0.3, 0.5, 0.7), (0.4, 0.6, 0.8), (0.5, 0.7, 0.9)]
+    cmap = LinearSegmentedColormap.from_list("Custom", colors)
+
+    # Create a figure with a black background
+    fig, ax = plt.subplots(facecolor='none')
+
+    # Plot confusion matrix with custom colormap
+    im = ax.imshow(conf_matrix, interpolation='nearest', cmap=cmap)
+
+    # Add labels to the plot with white text
+    classes = [0, 1]  # Assuming you have class 0 and class 1
+    num_classes = len(classes)
+    for i in range(num_classes):
+        for j in range(num_classes):
+            ax.text(j, i, format(conf_matrix[i, j], 'd'),
+                     ha="center", va="center", color="white")
+
+    # Customize ticks and labels
+    ax.set_xticks(np.arange(num_classes))
+    ax.set_yticks(np.arange(num_classes))
+    ax.set_xticklabels(classes)
+    ax.set_yticklabels(classes)
+    ax.set_xlabel('Predicted label', color="white")
+    ax.set_ylabel('True label', color="white")
+    ax.xaxis.label.set_color('white')
+    ax.yaxis.label.set_color('white')
+
+    # Add a colorbar
+    cbar = ax.figure.colorbar(im, ax=ax)
+    cbar.ax.yaxis.set_tick_params(color='white')
+    plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')  # Set colorbar ticks to white
+
+    # Set transparency for the colorbar
+    cbar.set_alpha(0)
+
+    plt.show()
+
 
