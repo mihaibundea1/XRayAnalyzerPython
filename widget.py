@@ -37,20 +37,20 @@ class NewWindow(QMainWindow):
         self.verticalLayout = QVBoxLayout()
 
         self.label = QLabel('File path for dataset: ')
-        self.label.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
-        self.text_edit= QLineEdit()
-        self.text_edit.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
-        self.text_edit.setPlaceholderText("Enter text here...")
+        self.label.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;background: rgb(45,45,45);")
+        self.text_edit= QLineEdit('D:/XRay/Images/chest_xray/val')
+        self.text_edit.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;background: rgb(45,45,45); ")
+        self.text_edit.setPlaceholderText("Enter path here...")
         self.button = QPushButton('Generate')
         self.button.clicked.connect(self.button_clicked)
-        self.button.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
+        self.button.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px; background: rgb(45,45,45);")
         self.horizontalLayout.addWidget(self.label)
         self.horizontalLayout.addWidget(self.text_edit)
         self.horizontalLayout.addWidget(self.button)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.canvas = FigureCanvas(Figure(facecolor='black'))
-        self.canvas.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.canvas.setStyleSheet("border: 1px solid rgb(60, 60, 60);background: rgb(45,45,45)")
         self.verticalLayout.addWidget(self.canvas)
 
         central_widget = QWidget()
@@ -142,12 +142,12 @@ class MainWindow(QMainWindow):
         self.rightVerticalLayout = QVBoxLayout()
 
         self.path_label = QLabel()
-        self.path_label.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.path_label.setStyleSheet("border: 1px solid rgb(60, 60, 60);background: rgb(45,45,45)")
         self.layout.addWidget(self.path_label)
 
         self.file_listbox = QListWidget()
         self.file_listbox.itemClicked.connect(self.load_selected_image)
-        self.file_listbox.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.file_listbox.setStyleSheet("border: 1px solid rgb(60, 60, 60);background: rgb(45,45,45)")
         self.file_listbox.setMaximumWidth(250)
         self.layout.addWidget(self.file_listbox)
 
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
         self.image_view = GraphicsView(self)
         self.image_view.setMinimumWidth(1000)
         self.image_view.photoClicked.connect(self.photoClicked)
-        self.image_view.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.image_view.setStyleSheet("border: 1px solid rgb(60, 60, 60);background: rgb(45,45,45)")
 
         self.buttonMove = QPushButton()
         self.buttonMove.setIcon(QIcon(":/moveIcon.png"))  # replace with your image path
@@ -165,7 +165,7 @@ class MainWindow(QMainWindow):
 
         # Set the QPushButton size to 32x32 pixels
         self.buttonMove.setFixedSize(QSize(32, 32))
-        self.buttonMove.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.buttonMove.setStyleSheet("border: 1px solid rgb(60, 60, 60);background: rgb(45,45,45)")
 
 
         # Make the QPushButton toggleable
@@ -179,14 +179,14 @@ class MainWindow(QMainWindow):
         self.fig = Figure(figsize=(6, 3), facecolor="none")
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setMaximumSize(400,400)
-        self.canvas.setStyleSheet("border: 1px solid rgb(60, 60, 60);")
+        self.canvas.setStyleSheet("border: 1px solid rgb(60, 60, 60);background: rgb(45,45,45)")
 
         # Create an axes instance in your figure
 
         self.rightVerticalLayout.addWidget(self.canvas)
 
         self.saveButton = QPushButton("Save Investigation Details", self)
-        self.saveButton.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;")
+        self.saveButton.setStyleSheet("border: 1px solid rgb(60, 60, 60);font-size: 20px;background: rgb(45,45,45)")
         self.saveButton.setMinimumHeight(100)
         self.saveButton.clicked.connect(self.save_to_pdf)
 
@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
         # Create a QListWidget for the photo details
         self.photo_details_listbox = QListWidget()
         self.photo_details_listbox.setMaximumWidth(400)
-        self.photo_details_listbox.setStyleSheet("border: 1px solid rgb(60, 60, 60); font-size: 20px;")
+        self.photo_details_listbox.setStyleSheet("border: 1px solid rgb(60, 60, 60); font-size: 20px;background: rgb(45,45,45)")
 
         properties = [Property("Result: "), Property("Image size: "), Property("Position of cursor: ")]
 
