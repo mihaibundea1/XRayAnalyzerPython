@@ -1,7 +1,7 @@
 # XRayAnalyzerPython
 
 ## Description
-XRayAnalyzerPython is an advanced application designed for the automatic analysis of pulmonary X-ray images, classifying them binary into two categories: Normal or Pneumonia. This innovative solution uses artificial intelligence techniques to assist in the rapid and accurate diagnosis of pneumonia.
+XRayAnalyzerPython is an application designed for the automatic analysis of pulmonary X-ray images, classifying them binary into two categories: Normal or Pneumonia. This innovative solution uses artificial intelligence techniques to assist in the rapid and accurate diagnosis of pneumonia.
 
 ## Key Features
 - Uses the DenseNet121 model for image classification
