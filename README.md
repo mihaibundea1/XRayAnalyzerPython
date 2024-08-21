@@ -41,5 +41,8 @@ pandas>=1.1.4
 opencv-python>=4.4.0.46
 PyQt5>=5.15.2  # sau altă bibliotecă GUI pe care o folosiți
 
+## Availability of Training Code
+The training code for the DenseNet121 model used in this project will be made public soon. This will allow users and developers to explore, modify, and contribute to the ongoing improvements of XRayAnalyzerPython. Stay tuned for updates.
+
 ## Contact
-For more information or questions, please contact [Mihai Bundea](https://github.com/mihaibundea1)
+For more information or questions, please contact [Mihai Bundea](https://ro.linkedin.com/in/mihai-bundea-551a55225)
