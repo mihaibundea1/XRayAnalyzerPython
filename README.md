@@ -39,7 +39,7 @@ matplotlib>=3.3.2
 scikit-learn>=0.23.2
 pandas>=1.1.4
 opencv-python>=4.4.0.46
-PyQt5>=5.15.2  # sau altă bibliotecă GUI pe care o folosiți
+PyQt5>=5.15.2
 
 ## Availability of Training Code
 The training code for the DenseNet121 model used in this project will be made public soon. This will allow users and developers to explore, modify, and contribute to the ongoing improvements of XRayAnalyzerPython. Stay tuned for updates.
